@@ -8,24 +8,25 @@ def readAll(user="All",targets=False,path="./datos/"):
     onlyfiles.sort()
     data = []
     searching_for = "datapoints"
+    h = 0;
     if targets:
         searching_for = "targets"
-
+        h = None;
     if user=="All":
         for c,f in enumerate(onlyfiles):
             if targets: c=c-1
             if f.find(searching_for)!=-1 and f.find("a")==0:
                 # print(c,"Adding:",f)
-                data.append(pd.read_csv(path+f,header=0,delimiter=" "))
+                data.append(pd.read_csv(path+f,header=h,delimiter=" "))
                 f = "b" + f[1:]
                 # print(c,"Adding:", f)
-                data.append(pd.read_csv(path+f,header=0,delimiter=" "))
+                data.append(pd.read_csv(path+f,header=h,delimiter=" "))
                 # print("-----:")
     else:
         for f in onlyfiles:
             if f.find(searching_for)!=-1 and f.find(user)==0:
                 # print("Adding:",f)
-                data.append(pd.read_csv(path+f,header=0,delimiter=" "))
+                data.append(pd.read_csv(path+f,header=h,delimiter=" "))
 
     data = pd.concat(data,ignore_index=True)
     return data
