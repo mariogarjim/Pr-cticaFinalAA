@@ -2,8 +2,11 @@ import readData as rd
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+<<<<<<< HEAD
 from sklearn.linear_model import LogisticRegression
     
+=======
+>>>>>>> 5593cd7053b05a4511741e57692cf9a49086f530
 
 #Leemos los datos de los distintos archivos
 affirdd = rd.load_affirm_data()
@@ -44,10 +47,10 @@ ynt = ynt.replace([1],9)
 
 #Concatenamos los ejemplos en una misma tabla
 data = pd.concat([affirdd,condd,doubtqd,emphd,negd,reld,topicsd,whd,ynd], ignore_index=True)
-# print(data)
+print(data)
 
-# test = rd.readAll()
-# print(test)
+#test = rd.readAll()
+#print(test)
 
 #Quitamos la columna de tiempo de los frames
 data.drop('0.0',axis=1,inplace=True)
@@ -58,7 +61,7 @@ y = pd.concat([affirdt,condt,doubtqt,empht,negt,relt,topicst,wht,ynt], ignore_in
 #ytest = rd.readAll(targets=True)
 # print(ytest)
 
-#Dividimos en train y test 
+#Dividimos en train y test
 X_train,X_test,y_train,y_test = train_test_split(data.iloc[:,1:],y,stratify=y)
 
 #Escalado

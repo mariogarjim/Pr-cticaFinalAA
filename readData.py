@@ -1,31 +1,44 @@
 # Definimos las funciones de lectura de datos
 import pandas as pd
-
 from os import listdir
 from os.path import isfile, join
+
 def readAll(user="All",targets=False,path="./datos/"):
     onlyfiles = [f for f in listdir(path) if  isfile(join(path,f))]
     onlyfiles.sort()
     data = []
     searching_for = "datapoints"
+    h = 0;
     if targets:
         searching_for = "targets"
-
+        h = None;
     if user=="All":
+        cont = 0
         for c,f in enumerate(onlyfiles):
             if targets: c=c-1
             if f.find(searching_for)!=-1 and f.find("a")==0:
                 # print(c,"Adding:",f)
-                data.append(pd.read_csv(path+f,header=0,delimiter=" "))
+                temp = pd.read_csv(path+f,header=h,delimiter=" ")
+                if targets:
+                    cont = cont + 1
+                    temp = temp.replace([1],cont);
+                data.append(temp)
                 f = "b" + f[1:]
                 # print(c,"Adding:", f)
-                data.append(pd.read_csv(path+f,header=0,delimiter=" "))
+                if targets:
+                    temp = temp.replace([1],cont);
+                data.append(temp)
                 # print("-----:")
     else:
+        cont = 1
         for f in onlyfiles:
             if f.find(searching_for)!=-1 and f.find(user)==0:
                 # print("Adding:",f)
-                data.append(pd.read_csv(path+f,header=0,delimiter=" "))
+                temp = pd.read_csv(path+f,header=h,delimiter=" ")
+                if targets:
+                    temp = temp.replace([1],cont);
+                    cont = cont + 1
+                data.append(temp)
 
     data = pd.concat(data,ignore_index=True)
     return data
