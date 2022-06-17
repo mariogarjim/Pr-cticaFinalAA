@@ -1,12 +1,12 @@
 import readData as rd
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-<<<<<<< HEAD
+from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
     
-=======
->>>>>>> 5593cd7053b05a4511741e57692cf9a49086f530
+
 
 #Leemos los datos de los distintos archivos
 affirdd = rd.load_affirm_data()
@@ -75,16 +75,20 @@ X_test = pd.DataFrame(scaler.transform(X_test))
 #Parámetros interesantes: penalty (regularización), C (inversa de la regularazación),
 #                         max_iter, solver --> Para multiclass: ‘newton-cg’, ‘sag’, ‘saga’ and ‘lbfgs’
 
-
+y_train = np.ravel(y_train)
 
 parametersLR = [{'penalty':['l1'], 'solver': ['saga'], 'C': [0.1,0.25,0.5,1,10], 
                  'max_iter':[100]}]
 
-for C in [0.1,0.25,0.5,1,10]:
-    RL =  LogisticRegression(C=C,penalty='l1',solver='saga', multi_class='multinomial')
-    RL.fit(X_train,y_train)
-    print(RL.score(X_train,y_train))
+#for C in [0.1,0.25,0.5,1,10]:
+RL =  LogisticRegression(C=0.1,penalty='l1',solver='saga', multi_class='multinomial')
+RL.fit(X_train,y_train)
+print(RL.score(X_train,y_train))
     
+
+baseline0 = DummyClassifier(strategy="most_frequent")
+baseline0.fit(X_test,y_test)
+print(f"Error del baseline0: {1-baseline0.score(X_test,y_test)}")
 
 
 
