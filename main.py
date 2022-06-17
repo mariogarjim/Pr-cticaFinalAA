@@ -1,7 +1,6 @@
 import readData as rd
 import pandas as pd
 
-
 #Leemos los datos de los distintos archivos
 affirdd = rd.load_affirm_data()
 affirdt = rd.load_affirm_target()
@@ -33,18 +32,18 @@ ynt = rd.load_yn_target()
 
 #Concatenamos los ejemplos en una misma tabla
 data = pd.concat([affirdd,condd,doubtqd,emphd,negd,reld,topicsd,whd,ynd], ignore_index=True)
-# print(data)
+print(data)
 
-# test = rd.readAll()
-# print(test)
+#test = rd.readAll()
+#print(test)
 
 #Quitamos la columna de tiempo de los frames
 data.drop('0.0',axis=1)
 
 #Concatenamos las etiquetas en una tabla
 y = pd.concat([affirdt,condt,doubtqt,empht,negt,relt,topicst,wht,ynt], ignore_index=True)
-# print(y)
-ytest = rd.readAll(targets=True)
+print(y)
+# ytest = rd.readAll(targets=True)
 # print(ytest)
 
 
