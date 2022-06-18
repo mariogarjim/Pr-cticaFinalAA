@@ -8,19 +8,22 @@ from sklearn.metrics import multilabel_confusion_matrix
 from os import listdir
 from os.path import isfile, join
 
-def Cmatrix_and_percentages(y_train,y_pred,labels=[0,1,2,3,4,5,6,7,8,9],title="Modelo Desconocido"):
+def Cmatrix(y_train,y_pred,labels=[0,1,2,3,4,5,6,7,8,9],title="Modelo Desconocido"):
     lrcm = confusion_matrix(y_train,y_pred,labels=labels)
     df_lrcm = pd.DataFrame(lrcm, columns = labels)
     plt.figure(figsize = (10,7))
     sns.heatmap(df_lrcm,annot=True,fmt="d",cbar=False,linewidths=.5, cmap="YlGnBu")
-    plt.title("Matriz de confusión" + title)
+    plt.title("Matriz de confusión " + title)
     plt.show()
 
+    return lrcm
+
+def Percentages(lrcm,y_train,title="Modelo Desconocido"):
     lrcm = np.array(lrcm,dtype=np.float)
-    cont = 1
     porcentajesLR = []
-    for data in ydata_table:
-        value = round(lrcm[cont,cont]/data[1][1]*100,2)
+    cont = 1
+    for i in range(1,10):
+        value = round(lrcm[cont,cont]/len(np.where(y_train==i)[0])*100,2)
         porcentajesLR.append(value)
         lrcm[cont,cont] = value
         cont = cont + 1
