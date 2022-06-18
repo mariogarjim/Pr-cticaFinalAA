@@ -1,7 +1,35 @@
 # Definimos las funciones de lectura de datos
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import multilabel_confusion_matrix
 from os import listdir
 from os.path import isfile, join
+
+def Cmatrix_and_percentages(y_train,y_pred,labels=[0,1,2,3,4,5,6,7,8,9],title="Modelo Desconocido"):
+    lrcm = confusion_matrix(y_train,y_pred,labels=labels)
+    df_lrcm = pd.DataFrame(lrcm, columns = labels)
+    plt.figure(figsize = (10,7))
+    sns.heatmap(df_lrcm,annot=True,fmt="d",cbar=False,linewidths=.5, cmap="YlGnBu")
+    plt.title("Matriz de confusión" + title)
+    plt.show()
+
+    lrcm = np.array(lrcm,dtype=np.float)
+    cont = 1
+    porcentajesLR = []
+    for data in ydata_table:
+        value = round(lrcm[cont,cont]/data[1][1]*100,2)
+        porcentajesLR.append(value)
+        lrcm[cont,cont] = value
+        cont = cont + 1
+
+    lrcm[0,0] = round(float(lrcm[0,0]) / float(len(np.where(y_train==0)[0])) * 100,2)
+    print("############## Porcentajes de Classificación " + title + " #########")
+    for c,p in enumerate(porcentajesLR):
+        print("Clase: {} {:.2f}%".format(c,round(p,2)))
+    print("##########################################################")
 
 def readAll(user="All",targets=False,path="./datos/"):
     onlyfiles = [f for f in listdir(path) if  isfile(join(path,f))]
@@ -17,18 +45,19 @@ def readAll(user="All",targets=False,path="./datos/"):
         for c,f in enumerate(onlyfiles):
             if targets: c=c-1
             if f.find(searching_for)!=-1 and f.find("a")==0:
-                # print(c,"Adding:",f)
+                #print(c,"Adding:",f)
                 temp = pd.read_csv(path+f,header=h,delimiter=" ")
                 if targets:
                     cont = cont + 1
                     temp = temp.replace([1],cont);
                 data.append(temp)
                 f = "b" + f[1:]
-                # print(c,"Adding:", f)
+                #print(c,"Adding:", f)
+                temp = pd.read_csv(path+f,header=h,delimiter=" ")
                 if targets:
                     temp = temp.replace([1],cont);
                 data.append(temp)
-                # print("-----:")
+                #print("-----")
     else:
         cont = 1
         for f in onlyfiles:
@@ -43,47 +72,153 @@ def readAll(user="All",targets=False,path="./datos/"):
     data = pd.concat(data,ignore_index=True)
     return data
 
-def load_affirm_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_affirmative_datapoints.txt",header=0,delimiter=" ")
-def load_affirm_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_affirmative_targets.txt",header=None,delimiter=" ")
+def load_affirm_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_affirmative_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_affirmative_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_affirmative_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
 
-def load_cond_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_conditional_datapoints.txt",header=0,delimiter=" ")
-def load_cond_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_conditional_targets.txt",header=None,delimiter=" ")
+def load_affirm_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_affirmative_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_affirmative_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_affirmative_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
 
-def load_doubtq_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_doubt_question_datapoints.txt",header=0,delimiter=" ")
-def load_doubtq_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_doubt_question_targets.txt",header=None,delimiter=" ")
+def load_cond_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_conditional_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_conditional_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_conditional_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
 
-def load_emphasis_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_emphasis_datapoints.txt",header=0,delimiter=" ")
-def load_emphasis_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_emphasis_targets.txt",header=None,delimiter=" ")
+def load_cond_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_conditional_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_conditional_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_conditional_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
 
-def load_neg_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_negative_datapoints.txt",header=0,delimiter=" ")
-def load_neg_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_negative_targets.txt",header=None,delimiter=" ")
 
-def load_rel_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_relative_datapoints.txt",header=0,delimiter=" ")
-def load_rel_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_relative_targets.txt",header=None,delimiter=" ")
+def load_doubtq_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_doubt_question_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_doubt_question_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_doubt_question_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
 
-def load_topics_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_topics_datapoints.txt",header=0,delimiter=" ")
-def load_topics_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_topics_targets.txt",header=None,delimiter=" ")
+def load_doubtq_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_doubt_question_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_doubt_question_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_doubt_question_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
 
-def load_wh_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_wh_question_datapoints.txt",header=0,delimiter=" ")
-def load_wh_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_wh_question_targets.txt",header=None,delimiter=" ")
 
-def load_yn_data(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_yn_question_datapoints.txt",header=0,delimiter=" ")
-def load_yn_target(user="b",path="./datos/"):
-    return pd.read_csv(path+user+"_yn_question_targets.txt",header=None,delimiter=" ")
+def load_emphasis_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_emphasis_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_emphasis_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_emphasis_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+def load_emphasis_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_emphasis_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_emphasis_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_emphasis_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+
+def load_neg_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_negative_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_negative_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_negative_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+def load_neg_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_negative_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_negative_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_negative_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+
+def load_rel_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_relative_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_relative_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_relative_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+def load_rel_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_relative_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_relative_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_relative_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+
+def load_topics_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_topics_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_topics_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_topics_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+def load_topics_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_topics_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_topics_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_topics_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+
+def load_wh_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_wh_question_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_wh_question_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_wh_question_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+def load_wh_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_wh_question_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_wh_question_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_wh_question_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+
+def load_yn_data(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_yn_question_datapoints.txt",header=0,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_yn_question_datapoints.txt",header=0,delimiter=" ")
+        b = pd.read_csv(path+"b_yn_question_datapoints.txt",header=0,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
+
+def load_yn_target(user="All",path="./datos/"):
+    if user!="All":
+        return pd.read_csv(path+user+"_yn_question_targets.txt",header=None,delimiter=" ")
+    else:
+        a = pd.read_csv(path+"a_yn_question_targets.txt",header=None,delimiter=" ")
+        b = pd.read_csv(path+"b_yn_question_targets.txt",header=None,delimiter=" ")
+        return pd.concat([a,b],ignore_index=True)
