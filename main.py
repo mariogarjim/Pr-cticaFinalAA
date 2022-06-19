@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import RandomForest as rf
 import MLPClassifier as mlpc
+import LearnCurve as lc
 from prettytable import PrettyTable
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -16,7 +17,6 @@ from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 
-
 def menu_preguntas():
     respuesta = input("¿Que opción desea?\n"+
                        "1: Buscar hiperparámetros Regresión Logística\n"
@@ -26,9 +26,12 @@ def menu_preguntas():
                        "5: Entrenar y ver resultados sobre TRAINING de mejor RandomForest obtenido\n"
                        "6: Buscar hiperparámetros MultiLayerPerceptron\n"
                        "7: Entrenar y ver resultados sobre TRAINING de mejor MultiLayerPerceptron\n"
-                       "8: Resultados obtenidos en test del mejor modelo\n"
+                       "8: Resultados obtenidos en TEST del MEJOR modelo\n"
+                       "9: Curva de aprendizaje del MEJOR modelo \n"
                        "10: Salir\n"
                        ">>>> ")
+    if respuesta == '':
+        respuesta = 100000
     return int(respuesta)
 
 import warnings
@@ -259,21 +262,37 @@ while(q!=10):
 
         mlpcm = rd.Cmatrix(y_train,y_pred,title="MultiLayerPerceptron")
         rd.Percentages(mlpcm,y_train)
-        
+
     elif q==8:
         if RF_entrenado:
             test_pred = bestRF.predict(X_test)
             RFcmTest = rd.Cmatrix(y_test,test_pred,title="Best Random Forest")
             rd.Percentages(RFcmTest,y_test,title="Best Random Forest")
             rd.LearningCurves(bestRF, X_train, y_train)
-            
+
         else:
+            print("@@@@@@@@@@@@@@@@@@@@@@@@")
             print("Primero se debe entrenar el modelo. Introduzca q=5")
-            
+            print("@@@@@@@@@@@@@@@@@@@@@@@@")
+
+    elif q==9:
+        if RF_entrenado:
+            k = 20
+            xrf, einrf, eoutrf = lc.learning_curve_data(bestRF,k,X_train,y_train,X_test,y_test)
+            lc.plot_lrcurve(xrf,einrf,eoutrf)
+            plt.grid()
+            plt.axvline(x=23000,linestyle='--',)
+            plt.legend(labels=["E_in","E_out","Desired Performance"])
+            plt.show()
+        else:
+            print("@@@@@@@@@@@@@@@@@@@@@@@@")
+            print("Primero se debe entrenar el modelo. Introduzca q=5")
+            print("@@@@@@@@@@@@@@@@@@@@@@@@")
+
     elif q==10:
         pass
     else:
         print("Acción no permitida, vuelve a probar. Para salir, escriba 10")
-        
-        
+
+
 

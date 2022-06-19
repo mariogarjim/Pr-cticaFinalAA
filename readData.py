@@ -7,30 +7,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import multilabel_confusion_matrix
 from os import listdir
 from os.path import isfile, join
-from sklearn.model_selection import learning_curve 
-
-def LearningCurves(bestRF,X_train,y_train):
-    print("############## CURVAS DE APRENDIZAJE #########")
-    #Curvas de aprendizaje
-    train_sizes, train_scores, test_scores = learning_curve(bestRF,X_train,y_train,cv=5,
-                                                            train_sizes=np.linspace(0.01, 1.0, 20), scoring='f1_micro')
-
-    train_error = 1 - train_scores
-    test_error = 1 - test_scores
-
-    train_mean = np.mean(train_error, axis=1)
-
-    test_mean = np.mean(test_error, axis=1)
-
-    
-    plt.subplots(1)
-    plt.plot(train_sizes, train_mean,  color="blue",  label="Ein")
-    plt.plot(train_sizes, test_mean, '--', color="red", label="Eout")
-    
-    plt.title("Curvas de Aprendizaje")
-    plt.xlabel("Tamaño del conjunto de entrenamiento"), plt.ylabel("Error Esperado"), plt.legend(loc="best")
-    plt.tight_layout()
-    plt.show()
+from sklearn.model_selection import learning_curve
 
 def Cmatrix(y_train,y_pred,labels=[0,1,2,3,4,5,6,7,8,9],title="Modelo Desconocido"):
     lrcm = confusion_matrix(y_train,y_pred,labels=labels)
