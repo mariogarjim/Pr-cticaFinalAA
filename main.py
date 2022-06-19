@@ -16,6 +16,7 @@ from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 
+
 def menu_preguntas():
     respuesta = input("¿Que opción desea?\n"+
                        "1: Buscar hiperparámetros Regresión Logística\n"
@@ -25,6 +26,7 @@ def menu_preguntas():
                        "5: Entrenar y ver resultados sobre TRAINING de mejor RandomForest obtenido\n"
                        "6: Buscar hiperparámetros MultiLayerPerceptron\n"
                        "7: Entrenar y ver resultados sobre TRAINING de mejor MultiLayerPerceptron\n"
+                       "8: Resultados obtenidos en test del mejor modelo\n"
                        "10: Salir\n"
                        ">>>> ")
     return int(respuesta)
@@ -224,6 +226,7 @@ while(q!=10):
 
         rfcm = rd.Cmatrix(y_train,y_pred,title="Random Forest")
         rd.Percentages(rfcm,y_train)
+        RF_entrenado = True
     elif q==6:
         print("############# Búsqueda hiperparámetros MLP ################")
         bestMLP, max_mlpp = mlpc.MultiLayerPerceptron(X_train,y_train)
@@ -256,7 +259,21 @@ while(q!=10):
 
         mlpcm = rd.Cmatrix(y_train,y_pred,title="MultiLayerPerceptron")
         rd.Percentages(mlpcm,y_train)
+        
+    elif q==8:
+        if RF_entrenado:
+            test_pred = bestRF.predict(X_test)
+            RFcmTest = rd.Cmatrix(y_test,test_pred,title="Best Random Forest")
+            rd.Percentages(RFcmTest,y_test,title="Best Random Forest")
+            rd.LearningCurves(bestRF, X_train, y_train)
+            
+        else:
+            print("Primero se debe entrenar el modelo. Introduzca q=5")
+            
     elif q==10:
         pass
     else:
         print("Acción no permitida, vuelve a probar. Para salir, escriba 10")
+        
+        
+
