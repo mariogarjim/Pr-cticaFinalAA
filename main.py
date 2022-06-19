@@ -180,7 +180,9 @@ while(q!=10):
 
         lrcm = rd.Cmatrix(y_train,y_pred,title="Regresión Logística")
         rd.Percentages(lrcm,y_train)
-
+        print("############## Reducción de Complejidad Obtenida ###############")
+        print("Número de atributos a cero: ", len(np.where(bestLR.coef_==0)[0]))
+        print("################################################################")
     elif q==3:
         print("################ Error Baseline Moda ###################")
         baseline0 = DummyClassifier(strategy="most_frequent")
