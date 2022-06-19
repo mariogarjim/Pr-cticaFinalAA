@@ -10,6 +10,7 @@ from os.path import isfile, join
 from sklearn.model_selection import learning_curve 
 
 def LearningCurves(bestRF,X_train,y_train):
+    print("############## CURVAS DE APRENDIZAJE #########")
     #Curvas de aprendizaje
     train_sizes, train_scores, test_scores = learning_curve(bestRF,X_train,y_train,cv=5,
                                                             train_sizes=np.linspace(0.01, 1.0, 20), scoring='f1_micro')
