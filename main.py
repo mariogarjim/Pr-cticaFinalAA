@@ -239,7 +239,7 @@ while(q!=10):
                         activation='tanh',
                         hidden_layer_sizes=100,
                         max_iter=300,
-                        learning_rate='constant',
+                        learning_rate='adaptative',
                         batch_size='auto',
                         random_state = 42,
                         )
