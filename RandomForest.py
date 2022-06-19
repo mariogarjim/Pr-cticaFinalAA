@@ -42,6 +42,7 @@ def RandomForest(X_train,y_train,scoring=['f1_micro','roc_auc_ovr'],
                         max_features=mf,
                         min_samples_leaf=msl,
                         bootstrap=True,
+                        random_state = 42,
                         n_jobs=2)
                 cv_results = cross_validate(RF,X_train,y_train,cv=5,scoring=scoring)
                 rf_models_table.add_row([par,cv_results['test_f1_micro'].mean(),cv_results['test_roc_auc_ovr'].mean()])

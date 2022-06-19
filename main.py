@@ -4,6 +4,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import RandomForest as rf
+import MLPClassifier as mlpc
 from prettytable import PrettyTable
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -13,14 +14,17 @@ from sklearn.model_selection import cross_validate
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
 
 def menu_preguntas():
-    respuesta = input("¿Que opcion desea?\n"+
+    respuesta = input("¿Que opción desea?\n"+
                        "1: Buscar hiperparámetros Regresión Logística\n"
-                       "2: Entrenar y ver resultados sobre Training  de mejor Regresión Logística obtenida\n"
+                       "2: Entrenar y ver resultados sobre TRAINING  de mejor Regresión Logística obtenida\n"
                        "3: Ver resultados del modelo de base 'most_frequent'\n"
                        "4: Buscar hiperparámetros RandomForest\n"
-                       "5: Entrenar y ver resultados sobre Training de mejor RandomForest obtenido\n"
+                       "5: Entrenar y ver resultados sobre TRAINING de mejor RandomForest obtenido\n"
+                       "6: Buscar hiperparámetros MultiLayerPerceptron\n"
+                       "7: Entrenar y ver resultados sobre TRAINING de mejor MultiLayerPerceptron\n"
                        "10: Salir\n"
                        ">>>> ")
     return int(respuesta)
@@ -121,13 +125,15 @@ LR_buscado = False
 LR_entrenado = False
 RF_buscado = False
 RF_entrenado = False
+MLP_buscado = False
+MLP_entrenado = False
 scoring = ['f1_micro','roc_auc_ovr']
 while(q!=10):
     q = menu_preguntas()
     if q==1:
-        print("################ Búscando Hiperparámetros RL ###################")
-        parametersLR = {'penalty':['l1'], 'solver': ['saga'], 'C': [0.1],
-                      'max_iter':[100]}
+        print("################ Búscando Hiperparámetros Regresión Logística ###################")
+        parametersLR = {'penalty':['l1'], 'solver': ['saga'], 'C': [0.1,0.25,0.5,1,5],
+                      'max_iter':[100,150]}
         total = 1
         for i in parametersLR.keys():
             total = total * len(parametersLR[i])
@@ -141,7 +147,8 @@ while(q!=10):
                 for p in parametersLR['penalty']:
                     for s in parametersLR['solver']:
                         RL =  LogisticRegression(C=C,max_iter=t,penalty=p,solver=s,
-                                                 multi_class='multinomial',n_jobs=2)
+                                                 multi_class='multinomial',n_jobs=2,
+                                                 random_state=42)
                         cv_results = cross_validate(RL,X_train,y_train,cv=5,scoring=scoring)
                         par = "C="+ str(C) + " maxIter=" + str(t) + " \npenalty=" + str(p) + " solver=" + s
                         lr_models_table.add_row([par,cv_results['test_f1_micro'].mean(),cv_results['test_roc_auc_ovr'].mean()])
@@ -149,22 +156,19 @@ while(q!=10):
                             maximo = cv_results['test_roc_auc_ovr'].mean()
                             max_p  = {'C':C,'solver':'saga','max_iter':t,'penalty':p}
                             bestLR = RL;
-                        # print(RL.score(X_train,y_train))
                     cont = cont + 1
-                    # print(cont/total*'=>',end='')
         print("############## Resultados Obtenidos ##############")
         print(lr_models_table)
-        print("################ FIN Búsqueda RL ###################")
+        print("################ FIN Búsqueda Regresión Logística ###################")
         LR_buscado = True
         if LR_entrenado == True:
             LR_entrenado == False
     elif q==2:
-        print("############## Entrenando mejor modelo ###############")
-        #RLf = LogisticRegression(C=max_p['C'],max_iter=max_p['max_iter'], penalty=max_p['penalty'],
-                                #solver=max_p['solver'], multi_class='multinomial',n_jobs=2)
+        print("############## Entrenando mejor modelo Regresión Logística ###############")
         if LR_buscado == False:
             print("[WARN]: Modelo no buscado anteriormente, usando mejores valores manuales")
-            bestLR = LogisticRegression(C=5,max_iter=150,penalty='l1',solver='saga',multi_class='multinomial')
+            bestLR = LogisticRegression(C=5,max_iter=150,penalty='l1',
+                    solver='saga',multi_class='multinomial',random_state=42)
         if LR_entrenado == False:
             bestLR.fit(X_train,y_train)
         else:
@@ -196,7 +200,7 @@ while(q!=10):
         print("#####################################################################")
 
     elif q==5:
-        print("############## Entrenando mejor modelo ###############")
+        print("############## Entrenando mejor modelo RandomForest ###############")
 
         if RF_entrenado == False:
             print("[WARN]: Modelo no buscado anteriormente, usando mejores valores manuales")
@@ -205,18 +209,51 @@ while(q!=10):
                         max_features='sqrt',
                         min_samples_leaf=1,
                         bootstrap=True,
+                        random_state = 42,
                         n_jobs=2)
         if RF_entrenado==False:
             bestRF.fit(X_train,y_train)
         else:
             print("[WARN]: Mejor modelo ya entrenado")
-        print("############## Fin Entrenamiento ###############")
+        print("############## Fin Entrenamiento Random Forest ###############")
 
         y_pred = bestRF.predict(X_train)
         # matrix = multilabel_confusion_matrix(y_train,y_pred)
 
         rfcm = rd.Cmatrix(y_train,y_pred,title="Random Forest")
         rd.Percentages(rfcm,y_train)
+    elif q==6:
+        print("############# Búsqueda hiperparámetros MLP ################")
+        bestMLP, max_mlpp = mlpc.MultiLayerPerceptron(X_train,y_train)
+        MLP_buscado==True
+        if MLP_entrenado==True:
+            MLP_entrenado=False
+        print("#####################################################################")
+
+    elif q==7:
+        print("############## Entrenando mejor modelo MultiLayerPerceptron ###############")
+
+        if MLP_entrenado == False:
+            print("[WARN]: Modelo no buscado anteriormente, usando mejores valores manuales")
+            bestMLP = MLPClassifier(
+                        activation='tanh',
+                        hidden_layer_sizes=100,
+                        max_iter=300,
+                        learning_rate='adaptive',
+                        batch_size='auto',
+                        random_state = 42,
+                        )
+        if MLP_entrenado==False:
+            bestMLP.fit(X_train,y_train)
+        else:
+            print("[WARN]: Mejor modelo ya entrenado")
+        print("############## Fin Entrenamiento MultiLayerPerceptron ###############")
+
+        y_pred = bestMLP.predict(X_train)
+        # matrix = multilabel_confusion_matrix(y_train,y_pred)
+
+        mlpcm = rd.Cmatrix(y_train,y_pred,title="MultiLayerPerceptron")
+        rd.Percentages(mlpcm,y_train)
     elif q==10:
         pass
     else:
